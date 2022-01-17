@@ -1,3 +1,4 @@
+
 describe('Hacker Stories', () => {
   const initialTerm = 'React'
   const newTerm = 'Cypress'
@@ -321,3 +322,27 @@ context('Errors, forçar falhas', () => {
     cy.get('p:contains(Something went wrong ...)').should('be.visible')
   })
 })
+
+context('Simulando atrasos na chamada a API', () => {
+    beforeEach(() => {
+      cy.intercept(
+        'GET',
+        '**/search**',
+        {
+          delay: 2000,
+          fixture: 'stories'
+        }
+      ).as('getDelayStories')
+    })
+
+    it('shows a "Loading ..." state before showing the results', () => {
+      cy.visit('/')
+    
+      cy.carregamentoEmostradoEoculto()
+    
+      cy.wait('@getDelayStories')
+
+      cy.get('.item').should('have.length', 2)
+      
+    })
+  })
